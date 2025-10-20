@@ -8,7 +8,7 @@ def predict():
     from sklearn.preprocessing import LabelEncoder
     import pandas as pd
 
-    data = pd.read_csv('car_streamlit\Car details v3 (1).csv' ,encoding= 'latin 1')
+    data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
     df = pd.DataFrame(data)
 
     # Clean column names
@@ -90,4 +90,5 @@ def predict():
             return predict_price
         else:
             return 0  # or None
+
 

@@ -1,7 +1,8 @@
 streamlit
 pandas
+matplotlib
 numpy
 scikit-learn
 altair
 seaborn
-matplotlib
+

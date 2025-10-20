@@ -2,10 +2,10 @@
 streamlit
 
 # Data Manipulation and Analysis
-pandas , linear regression , numpy,preprocessing,modelselection,metrics,sklearn, 
+pandas , linear regression , numpy,preprocessing,modelselection,metrics,scikit-learn
 
 # Interactive Visualization (Used by st.altair_chart)
-altair , seaborn, matplot 
+altair , seaborn, matplotlib.pyplot
 
 # Optional: If you use the native Altair JSON renderer for better performance (recommended)
 # vega_datasets 

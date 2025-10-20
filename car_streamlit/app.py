@@ -22,7 +22,7 @@ st.markdown(
     }
    
     .st-emotion-cache-14vh5up{
-       background-image: linear-gradient(to right, #f8e9ee, #e4bef7);
+       background-image: linear-gradient(to right, #4169E1 ,#f8e9ee);
     }
     
     .mark-group role-title{
@@ -49,7 +49,7 @@ st.markdown(
     """
 <style>
     .st-emotion-cache-1yiq2ps{
-        background-image: linear-gradient(to right, #f8e9ee, #e4bef7);
+        background-image: linear-gradient(to right, #4169E1 ,#f8e9ee);
         
     }
     .st-emotion-cache-tn0cau{
@@ -162,6 +162,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

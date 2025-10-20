@@ -1,16 +1,9 @@
-# Primary Application Framework
-streamlit
 
-# Data Manipulation and Analysis
-pandas 
+streamlit
+pandas
 numpy
 scikit-learn
-
-# Interactive Visualization (Used by st.altair_chart)
-altair 
+altair
 seaborn
 matplotlib
 
-# Optional: If you use the native Altair JSON renderer for better performance (recommended)
-# vega_datasets 
-# python-json-logger

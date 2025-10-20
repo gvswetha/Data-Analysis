@@ -61,6 +61,16 @@ st.markdown(
     /* background-color:#4169E1;*/
     opacity: 0.9; 
     }  
+
+    [data-testid="stSuccess"] {
+        /* Set a brighter, more vibrant green background */
+        background-color: #66ff66 !important; /* A very bright lime green */
+        color: #004d00 !important;          /* Darker text for contrast */
+        border: 2px solid #009900;          /* A more distinct border */
+        border-radius: 10px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Optional: add shadow */
+    }
+    
 </style>
     """,
     unsafe_allow_html=True
@@ -152,6 +162,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

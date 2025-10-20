@@ -10,7 +10,7 @@ import time # Import time for timestamp
 @st.cache_resource
 def load_and_train_model():
     # Note: Use forward slash for path portability
-     data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
+    data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
     df = pd.DataFrame(data)
 
     # Clean column names
@@ -149,6 +149,7 @@ def predict():
     if st.button("🔄 Clear Prediction History"):
         st.session_state['prediction_history'] = []
         st.rerun() # Use st.rerun to refresh the display immediately
+
 
 
 

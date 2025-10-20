@@ -57,7 +57,7 @@ st.markdown(
     }
     
    .stSidebar {
-    background-image: linear-gradient(to right, #f8e9ee, #e4bef7);
+    background-image: linear-gradient(to right, #4169E1 ,#f8e9ee);
     /* background-color:#4169E1;*/
     opacity: 0.9; 
     }  
@@ -152,6 +152,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

@@ -48,7 +48,7 @@ print(df.isnull().sum())
 #spliting brand name from name column
 
 def pyfunction():
-    data = pd.read_csv('car_streamlit\Car details v3 (1).csv' ,encoding= 'latin 1')
+    data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
     df = pd.DataFrame(data)
     df['brand'] = df['name'].str.split().str[0]
     brand = df.groupby('brand')['name'].count()

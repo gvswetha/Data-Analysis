@@ -39,7 +39,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
     
-data = pd.read_csv('Car details v3 (1).csv' ,encoding= 'latin 1')
+data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
 df = pd.DataFrame(data)
 # display(df.head())
 

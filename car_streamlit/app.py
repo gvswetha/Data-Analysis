@@ -76,7 +76,7 @@ st.markdown(
 st.header("🚘Car Prediction Analysis 📈")
 
 
-data = pd.read_csv('car_streamlit\Car details v3 (1).csv' ,encoding= 'latin 1')
+data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
 df = pd.DataFrame(data)
 
 st.sidebar.title("🚗 Car Analytics App")
@@ -152,6 +152,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

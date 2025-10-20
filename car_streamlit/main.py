@@ -8,7 +8,7 @@ import altair as alt
 from data_table import table
 
 
-data = pd.read_csv('car_streamlit\Car details v3 (1).csv' ,encoding= 'latin 1')
+data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
 df = pd.DataFrame(data)
 
 
@@ -132,4 +132,5 @@ def chart3():
     # Display the single figure containing all three plots
     st.pyplot(fig)
     
+
    

@@ -13,7 +13,7 @@ from tensorflow.keras.optimizers import Adam
 import streamlit as st
 import base64
 
-data = pd.read_csv('HR-Employee-Attrition.csv',encoding="latin 1")
+data = pd.read_csv('HR_Attrition/HR_Attrition(streamlit)/HR-Employee-Attrition.csv',encoding="latin 1")
 df = pd.DataFrame(data)
 
 df = df.rename(columns={"ï»¿Age" :"Age"})
@@ -319,7 +319,7 @@ def charts():
     # -----------------------------------------------------------
     # LOAD DATA
     # -----------------------------------------------------------
-    data = pd.read_csv('HR-Employee-Attrition.csv', encoding="latin 1")
+    data = pd.read_csv('HR_Attrition/HR_Attrition(streamlit)/HR-Employee-Attrition.csv', encoding="latin 1")
     df = pd.DataFrame(data)
     df = df.rename(columns={"ï»¿Age": "Age"})
 
@@ -497,3 +497,4 @@ def charts():
         st.plotly_chart(donut4, use_container_width=True, key="donut4")
 
     return None
+

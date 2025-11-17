@@ -4,7 +4,7 @@ from employ_ann import test_train,feature_eng,kpi,predict,set_bg,charts
 
 import streamlit as st
 
-data = pd.read_csv('HR-Employee-Attrition.csv',encoding="latin 1")
+data = pd.read_csv('HR_Attrition/HR_Attrition(streamlit)/HR-Employee-Attrition.csv',encoding="latin 1")
 df = pd.DataFrame(data)
 
 st.markdown("""
@@ -97,4 +97,5 @@ elif menu == "Attrition Prediction":
     
 elif menu == "data_table":
     monthly_income_range = feature_eng()
+
    

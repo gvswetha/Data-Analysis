@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import altair as alt 
 from car_prediction import yearly_profit
-from main import header,visual,chart3
+from main import header,visual,chart3,set_background_image
 from prediction import predict
 from data_table import show_table,prepare_data,show_tb2,show_chart,chart3,generate_transmission_chart
 # Inject CSS to style the DataFrame
@@ -77,7 +77,7 @@ st.markdown(
 )
 
 
-
+set_background_image()
 # ... rest of your application code ...
 
 
@@ -162,6 +162,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

@@ -1,8 +1,8 @@
 streamlit
 pandas
 numpy
-scikit-learn
-altair
-seaborn
 matplotlib
+joblib
 tensorflow
+shap
+plotly

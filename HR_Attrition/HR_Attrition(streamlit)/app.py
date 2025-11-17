@@ -80,7 +80,7 @@ def inject_opacity_css():
 inject_opacity_css()
 
 
-set_bg("slider-main-slide.jpg")
+set_bg("HR_Attrition/HR_Attrition(streamlit)/slider-main-slide.jpg")
 st.title("👩🏻‍💻 Employee Attrition Prediction using ANN 📊")
 
 # Employee_Attrition_Probability,history,df = test_train()
@@ -99,3 +99,4 @@ elif menu == "data_table":
     monthly_income_range = feature_eng()
 
    
+

@@ -1,4 +1,0 @@
-[runner]
-# This line tells the Streamlit builder for *this specific app* # where to find its dependencies.
-# We use a RELATIVE path here because the file is local to the folder.
-requirementsFile = "requirements.txt"

@@ -11,7 +11,57 @@ from data_table import table
 data = pd.read_csv('car_streamlit/Car details v3 (1).csv' ,encoding= 'latin 1')
 df = pd.DataFrame(data)
 
+import streamlit as st
+import base64
+import os
 
+# --- Configuration ---
+# ⚠️ Update this path if your image is not in this exact location!
+IMAGE_PATH = r"car_streamlit/ᴇᴅɢᴇ ᴏғ ᴛʜᴇ ᴄʟɪғғ.jpg" 
+
+# --- Function to Encode Image ---
+def get_base64_of_bin_file(bin_file):
+    """
+    Converts a local file to a Base64 encoded string,
+    which can be embedded directly into CSS.
+    """
+    try:
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    except FileNotFoundError:
+        st.error(f"Error: Image file not found at {bin_file}")
+        return None
+
+# --- Main Logic ---
+def set_background_image():
+    # 1. Check if the file exists
+    if not os.path.exists(IMAGE_PATH):
+        st.error(f"Cannot find background image at: {IMAGE_PATH}")
+        st.stop()
+        
+    # 2. Get the Base64 string
+    b64_image = get_base64_of_bin_file(IMAGE_PATH)
+
+    if b64_image:
+        # 3. Create the CSS style
+        # The selector .st-emotion-cache-1yiq2ps targets the main Streamlit container.
+        css_style = f"""
+        <style>
+        .st-emotion-cache-1yiq2ps {{
+            background-image: url("data:image/jpg;base64,{b64_image}");
+            background-size: cover;          /* Ensures the image covers the entire area */
+            background-position: center;     /* Centers the image */
+            background-repeat: no-repeat;    /* Prevents tiling */
+        }}
+        </style>
+        """
+        
+        # 4. Inject the CSS into the Streamlit app
+        st.markdown(css_style, unsafe_allow_html=True)
+        return None
+    
+    
 
 def header(): 
     st.subheader("📊 Dashboard")
@@ -134,3 +184,4 @@ def chart3():
     
 
    
+

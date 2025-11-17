@@ -53,8 +53,9 @@ st.markdown(
         
     }
     .st-emotion-cache-tn0cau{
-        color: black;
+        color: white;
     }
+    
     
    .stSidebar {
     background-image: linear-gradient(to right, #4169E1 ,#f8e9ee);
@@ -162,6 +163,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

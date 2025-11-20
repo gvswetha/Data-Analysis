@@ -80,6 +80,7 @@ st.markdown(
 
 set_background_image()
 # ... rest of your application code ...
+st.sidebar.image("car_streamlit/ᴇᴅɢᴇ ᴏғ ᴛʜᴇ ᴄʟɪғғ.jpg", use_column_width=True)
 
 
 # ... rest of your code (st.header, st.sidebar, menu logic, etc.)
@@ -163,6 +164,7 @@ st.sidebar.subheader("🔮 Predict Future Car Price")
 
 
  
+
 
 
 

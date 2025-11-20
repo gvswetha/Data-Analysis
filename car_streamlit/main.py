@@ -61,7 +61,36 @@ def set_background_image():
         st.markdown(css_style, unsafe_allow_html=True)
         return None
     
-    
+ def set_sidebar_background_image(image_path, zoom=2.0):
+    """
+    Set background image for Streamlit sidebar with zoom + bottom-right position.
+    zoom = 2.0 means 200% zoom.
+    """
+
+    # Check if file exists
+    if not os.path.exists(image_path):
+        st.error(f"Cannot find sidebar background image at: {image_path}")
+        st.stop()
+
+    # Convert image to base64
+    with open(image_path, "rb") as img_file:
+        b64_image = base64.b64encode(img_file.read()).decode()
+
+    # CSS for sidebar background
+    css_code = f"""
+    <style>
+        [data-testid="stSidebar"] {{
+            background-image: url("data:image/png;base64,{b64_image}");
+            background-repeat: no-repeat;
+            background-size: {zoom*100}% auto;   /* ZOOM the image */
+            background-position: bottom right;   /* Position bottom-right */
+        }}
+    </style>
+    """
+
+    # Inject CSS
+    st.markdown(css_code, unsafe_allow_html=True)
+    return None    
 
 def header(): 
     st.subheader("📊 Dashboard")
@@ -184,4 +213,5 @@ def chart3():
     
 
    
+
 

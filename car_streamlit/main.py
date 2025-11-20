@@ -61,7 +61,7 @@ def set_background_image():
         st.markdown(css_style, unsafe_allow_html=True)
         return None
     
- def set_sidebar_background_image(image_path, zoom=2.0):
+def set_sidebar_background_image(image_path, zoom=2.0):
     """
     Set background image for Streamlit sidebar with zoom + bottom-right position.
     zoom = 2.0 means 200% zoom.
@@ -213,5 +213,6 @@ def chart3():
     
 
    
+
 
 

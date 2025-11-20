@@ -1,0 +1,9 @@
+Model evaluation metrics:
+AUC: 0.8036
+Precision: 0.6122
+Recall: 0.5000
+
+Top SHAP features:
+
+LIME inspected test indices (positions in test set):
+195, 75, 160

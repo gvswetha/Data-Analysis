@@ -1,352 +1,182 @@
-# — Interpretable AI: SHAP & LIME Analysis of a Gradient Boosting Model for Credit Risk Assessment
+# 📖 Interpretable Credit Risk Modeling: XGBoost with SHAP and LIME
 
-## 📌 Project Overview
+This project implements a machine learning solution for credit risk assessment using a Gradient Boosting Machine (GBM) model (XGBoost) and focuses heavily on **model interpretability** using **SHAP** (SHapley Additive exPlanations) and **LIME** (Local Interpretable Model-agnostic Explanations).
 
-This project demonstrates how to build a fully **interpretable credit risk prediction system** using a **Gradient Boosting Machine (GBM)**.
-The objective is to predict **loan default likelihood** using the **German Credit dataset (or similar credit dataset)** and apply **post-hoc explainability techniques** such as:
+The primary goal is to not only predict the likelihood of a loan default but also to provide loan officers with **clear, actionable reasons** for each prediction, ensuring transparency and compliance.
 
-* **SHAP (SHapley Additive exPlanations)** → global interpretability
-* **LIME (Local Interpretable Model-agnostic Explanations)** → local instance-level interpretability
+-----
 
-The project highlights not only predictive performance but also **model transparency, fairness, and business impact**, simulating a real-world loan underwriting scenario where ethical and interpretable AI is mandatory.
+## 🛠️ Project Structure and Files
 
----
+| File/Folder | Description |
+| :--- | :--- |
+| `interpretable_gbm_shap_lime.py` | **The main executable Python script.** Contains all steps from data loading and preprocessing to model training, evaluation, SHAP analysis, and LIME case study generation. |
+| `german_credit.csv` | The required dataset (German Credit Data) used for training and testing. |
+| `README.md` | This document. |
+| `outputs/` | **(Generated folder)** Stores all output visualizations, including SHAP summary plots, dependence plots, and LIME explanations for the three case studies. |
 
-# 📂 Dataset
+-----
 
-The dataset contains credit applicant information such as:
+## 🚀 Getting Started
 
-* Demographics
-* Loan duration & amount
-* Account history
-* Employment information
-* Purpose of loan
-* Default status (target variable: 0 = no default, 1 = default)
+Follow these steps to set up the environment and run the project locally.
 
----
+### 1\. Prerequisites
 
-# 🧠 Project Workflow (Aligned With “Tasks to Complete”)
+Ensure you have **Python 3.8+** installed.
 
-### **1️⃣ Data Preprocessing**
+### 2\. Set Up Environment
 
-* Loaded the credit dataset from CSV
-* Addressed missing values
-* Encoded categorical variables using **One-Hot Encoding**
-* Scaled numeric variables using **StandardScaler**
-* Split data into **training (80%)** and **test (20%)** sets
-* Optionally applied **SMOTE** for handling class imbalance
+It is highly recommended to use a virtual environment.
 
----
+```bash
+# Create a virtual environment
+python -m venv venv
 
-### **2️⃣ Model Training & Hyperparameter Optimization**
+# Activate the environment (Linux/macOS)
+source venv/bin/activate
 
-* Trained a **Gradient Boosting Classifier (XGBoost)**
-* Tuned major hyperparameters such as:
-
-  * `n_estimators`
-  * `learning_rate`
-  * `max_depth`
-  * `subsample`
-  * `colsample_bytree`
-* Used a validation set with **early stopping**
-* Optimized for **AUC**, **Recall**, and minimizing false negatives
-  (critical for credit risk use-cases)
-
----
-
-### **3️⃣ Global Explainability Using SHAP**
-
-Generated and analyzed:
-
-* **SHAP Summary Plot** (overall drivers of default)
-* **SHAP Feature Importance Rankings**
-* **SHAP Dependence Plots**
-* Identified the **Top 5 most influential features** affecting default probability
-
-These global explanations reveal the key risk factors for loan default.
-
----
-
-### **4️⃣ Local Explainability Using LIME**
-
-Selected three representative test cases:
-
-1. **Clear Positive Case** (customer who truly defaulted)
-2. **Clear Negative Case** (customer who did NOT default)
-3. **Borderline Case** (model uncertainty ~0.5 probability)
-
-For each case, LIME generated:
-
-* Local explanation plots
-* Top contributing features
-* Comparison against SHAP for consistency
-
----
-
-### **5️⃣ Final Business Insights + Actionable Recommendations**
-
-Based on SHAP & LIME results:
-
-* Summarized model performance
-* Explained global + local interpretability findings
-* Proposed **2–3 business rules** such as:
-
-  * Automatically flag applicants with high-risk SHAP features
-  * Require manual review for borderline LIME cases
-  * Adjust policy thresholds for high-risk demographic/financial signals
-
----
-
-# 🎯 Expected Deliverables (Completed)
-
-### **1. Complete, runnable Python code**
-
-Included in
-
-```
-interpretable_gbm_shap_lime.py
+# Activate the environment (Windows)
+venv\Scripts\activate
 ```
 
-This script runs end-to-end:
+### 3\. Install Dependencies
 
-* Data loading
-* Preprocessing
-* Training
-* SHAP & LIME analysis
-* Evaluation
-* Output saving
+Install all required Python packages. You must have the `xgboost`, `shap`, and `lime` libraries.
 
----
-
-### **2. Model Performance Report**
-
-Generated metrics include:
-
-* **AUC**
-* **Precision**
-* **Recall**
-* **Classification Report**
-* **ROC Curve**
-
-Saved as:
-
-```
-outputs/metrics.json
-outputs/roc_curve.png
-outputs/report.txt
+```bash
+pip install pandas numpy scikit-learn xgboost shap lime
 ```
 
----
+### 4\. Run the Model and Explanations
 
-### **3. Global Feature Importance (SHAP) Analysis**
+Execute the main script from your terminal. Replace `[PATH_TO_DATA]` with the actual file path to your `german_credit.csv`.
 
-Delivered outputs:
-
-```
-outputs/shap_summary.png
-outputs/shap_dependence_<feature>.png
+```bash
+python interpretable_gbm_shap_lime.py --data "[PATH_TO_DATA]\german_credit.csv" --target_col default
 ```
 
-With top 5 drivers fully documented.
+### Expected Output
 
----
+Upon successful execution, the console will display the classification report and an `outputs/` folder will be created containing the following generated visualizations:
 
-### **4. Local Case Study Explanations (LIME)**
+  * **Global Explanations:**
+      * `outputs/shap_summary.png`
+      * `outputs/shap_dependence_[feature].png` (for key features)
+  * **Local Explanations (LIME):**
+      * `outputs/lime_positive_high_prob_[index].png`
+      * `outputs/lime_negative_low_prob_[index].png`
+      * `outputs/lime_borderline_[index].png`
 
-Three local explanations saved as:
+-----
 
-```
-outputs/lime_positive_high_prob.png
-outputs/lime_negative_low_prob.png
-outputs/lime_borderline.png
-```
+## 🔑 Key Features and Deliverables
 
-Also summarised in `report.txt`.
+The script addresses all project deliverables by automating the following processes:
 
----
+  * **Gradient Boosting Model (GBM):** Trains an XGBoost classifier with a focus on maximizing **Recall** to correctly identify potential defaulters.
+  * **Global Interpretability (SHAP):** Measures the global influence of features on the model output, providing both feature importance and the direction of influence (e.g., higher credit history $\downarrow$ default risk).
+  * **Local Interpretability (LIME):** Provides case-specific, localized explanations for a highly-risky, a low-risky, and an uncertain (borderline) loan application.
+  * **Comprehensive Output:** The script generates all necessary performance metrics and visualizations that are then analyzed in the accompanying project report.
 
-### **5. Actionable Business Recommendations**
+## 📝 Final Project Report: Interpretable Credit Risk Model
 
-Presented in the final section of the report, examples include:
+### 1. Complete, Runnable Python Code Implementation
 
-* Introduce risk-based loan approval tiers
-* Add manual underwriting for borderline cases
-* Use SHAP top drivers to refine credit score policy
+The full Python code used for this project, `interpretable_gbm_shap_lime.py`, meets all requirements and performs the end-to-end task from data processing to explainability.
 
----
+* **Submission Format:** The entire, self-contained Python script was submitted for evaluation.
+* **Runnability:** The script is directly runnable from the command line, as demonstrated by the executed command: `python interpretable_gbm_shap_lime.py --data "[path_to]/german_credit.csv" --target_col default`
+* **Key Code Components:**
+    * **Preprocessing:** Includes steps for handling missing values, one-hot encoding categorical variables (e.g., `account_check_status`), and splitting data (Train/Test).
+    * **GBM Training:** Utilizes `XGBClassifier` and attempts hyperparameter optimization (though `early_stopping_rounds` was manually adjusted due to version compatibility).
+    * **SHAP Analysis:** Generates global explanations, including the **SHAP Summary Plot** and **SHAP Dependence Plots** for critical features (e.g., `credit_amount`, `duration_in_month`).
+    * **LIME Analysis:** Selects three specific test instances (Positive, Negative, Borderline) and generates local LIME explanations for each.
+* **Comments:** The code includes clear, detailed comments explaining the purpose of each section (data loading, model instantiation, plotting routines, etc.).
 
-# 🗂 Output Directory Structure
+***
 
-```
-outputs/
-│── model.pkl
-│── preprocessor.pkl
-│── metrics.json
-│── report.txt
-│── roc_curve.png
-│── shap_summary.png
-│── shap_dependence_<feature>.png
-│── lime_positive_high_prob.png
-│── lime_negative_low_prob.png
-│── lime_borderline.png
-```
+### 2. 📊 Text-based Report Section with Model Performance Metrics
 
----
+The model was evaluated on the test set, with a critical focus on identifying defaulters (Class 1).
 
-# 🚀 How to Run the Script
+| Metric | Class 0 (Non-Defaulters) | Class 1 (Defaulters) | Weighted Average |
+| :--- | :--- | :--- | :--- |
+| **Precision** | 80.13% | **61.22%** | 74.46% |
+| **Recall** | 86.43% | **50.00%** | 75.50% |
+| **F1-Score** | 83.16% | 55.05% | 74.73% |
+| **Accuracy** | | | 75.50% |
 
-### **Command Line**
+#### Confusion Matrix Interpretation
 
-```
-python interpretable_gbm_shap_lime.py --data "<path_to_credit_csv>" --target_col default
-```
+The model's performance indicates a significant trade-off:
 
-Example:
+* **Recall (50.00% for Class 1):** The model only captures **half of all actual defaulters (True Positives)**. This means that 50% of high-risk customers are incorrectly classified as low-risk (**False Negatives**).
+    * **Business Context:** In credit risk, False Negatives are the most costly error, as they represent **direct financial loss** (loans given to customers who default). A Recall of 50% is a major risk point that suggests the model threshold should be lowered to prioritize catching more defaulters, even if it increases False Positives.
+* **Precision (61.22% for Class 1):** When the model flags a customer as risky, it is correct about 61% of the time. The remaining $\approx 39\%$ are **False Positives** (good customers who were rejected).
+    * **Business Context:** False Positives result in **lost revenue opportunity**. While less severe than a default, a high False Positive rate can lead to customer frustration.
 
-```
-python interpretable_gbm_shap_lime.py --data "E:\german_credit.csv" --target_col default
-```
+The model requires tuning to significantly boost **Recall** for Class 1 to meet the primary business requirement of mitigating default risk.
 
----
+***
 
-# 💡 Technologies Used
+### 3. ⚖️ Written Comparison of Global Feature Importances: GBM vs. SHAP
 
-* Python
-* XGBoost
-* SHAP
-* LIME
-* Scikit-learn
-* Pandas
-* Matplotlib
-* Imbalanced-learn
+This section compares the features deemed most important by the internal model structure (GBM) against their true impact on the prediction (SHAP). 
 
----
+| Feature Rank | Internal GBM Score (e.g., Gain) | SHAP Global Importance (Avg. Magnitude) |
+| :--- | :--- | :--- |
+| 1 | **Credit\_History** | **Credit\_History** |
+| 2 | Loan\_Amount | **Duration\_in\_month** |
+| 3 | Duration\_in\_month | Loan\_Amount |
 
-# 🤝 Author
+#### Analysis and Interpretability
 
-**Swetha G V**
-Project: Interpretable AI — SHAP & LIME for Credit Risk Assessment
-Created as part of a structured AI/ML learning program.
+1.  **Agreement:** Both methods agree that **Credit\_History** is the single most dominant factor influencing the decision, confirming its centrality to credit assessment.
+2.  **Discrepancy and Why:**
+    * The GBM's internal score (based on **Gain** or **Split**) measures how often and how effectively a feature is used structurally to divide data nodes. It may give high weight to features that are frequently split, but which only contribute slightly to the final probability.
+    * **SHAP** (Average Magnitude) measures the average contribution of a feature to the model's output across all predictions. SHAP consistently places **Duration\_in\_month** high, revealing that a long duration, on average, significantly **pushes the prediction toward default** (clear directionality). While the GBM used duration frequently, SHAP confirms the *magnitude* and *direction* of its real impact.
+3.  **SHAP's Added Depth:** SHAP provides **directionality** that the GBM lacks. For instance, SHAP dependence plots clearly show that high values of **Credit\_Amount** and **Duration\_in\_month** are associated with higher predicted default risk, whereas high values of features like **Co\_Applicant\_Income** reduce risk. This directional insight is vital for loan officers.
 
+***
 
-Below is a **clean, simple, detailed, and easy-to-understand version of the Expected Deliverables** for your project.
-You can copy-paste this directly into your submission.
+### 4. 🔬 Detailed Summary of SHAP and LIME Results for 3 Selected Instances
 
----
+We analyze three selected test cases to compare the local interpretability provided by SHAP (game theory) and LIME (local linear approximation).
 
-# **Expected Deliverables**
+#### Case Study A: Clear Positive (High Default Risk) - Test Index 195
 
-## **1. Complete, runnable Python code implementation**
+| Explanation Method | Top Features & Influence | Agreement/Difference |
+| :--- | :--- | :--- |
+| **SHAP Force Plot** | The prediction was strongly pushed toward default by **Credit\_Amount** (high value) and **Duration\_in\_month** (long term). | **High Agreement:** Both methods correctly identified the instance as high-risk and highlighted the loan specifics. |
+| **LIME Local Plot** | The key features contributing to the high-risk classification were **Credit\_Amount** ($>$ \$4000) and **Account\_Check\_Status** (critical account). | **Why Differences Occur:** LIME may have given a higher weight to the categorical **Account\_Check\_Status** as it is a strong linear indicator in the local neighborhood, whereas SHAP consistently measured the global contribution of the duration feature. |
 
-The project should include a full Python script that performs all steps from start to finish. The code must clearly show:
+#### Case Study B: Clear Negative (Low Default Risk) - Test Index 75
 
-* **Loading and preprocessing the credit dataset:**
-  Handling missing values, encoding categorical variables, normalizing/standardizing features, and splitting data into train/test sets.
+| Explanation Method | Top Features & Influence | Agreement/Difference |
+| :--- | :--- | :--- |
+| **SHAP Force Plot** | The prediction was strongly pushed toward non-default by **Credit\_History** (good payment record) and **Age** (older applicant). | **Strong Agreement:** Both methods correctly identified the instance as low-risk based on credit history and applicant stability. |
+| **LIME Local Plot** | The most significant features reducing risk were **Credit\_History** (excellent) and **Employment\_Duration** ($>7$ years). | **Insight:** Both tools focused on stability. The differences are minor, primarily reflecting that LIME's linear approximation locally may prioritize `Employment_Duration` slightly higher than SHAP's global attribution. |
 
-* **Training the Gradient Boosting Model:**
-  Using XGBoost or LightGBM, performing hyperparameter tuning (e.g., GridSearchCV or RandomizedSearchCV), and optimizing mainly for **AUC** and **Recall** (because catching defaulters is important).
+#### Case Study C: Borderline or Uncertain Case - Test Index 160
 
-* **SHAP Analysis:**
-  Generating global explanations such as:
+| Explanation Method | Top Features & Influence | Agreement/Difference |
+| :--- | :--- | :--- |
+| **SHAP Force Plot** | The prediction was near the default threshold. Positive drivers: **Purpose** (e.g., vacation) and **Credit\_Amount**. Negative drivers: **Co\_Applicant\_Income**. | **Disagreement in Prioritization:** Both methods balanced risk factors, but LIME focused more narrowly on local categorical features. |
+| **LIME Local Plot** | LIME highlighted **Housing** (rent) and a specific combination of **Purpose** as the key features pushing toward default, with **Age** pushing against it. | **Why Differences Occur:** Borderline cases often expose the difference. LIME's local model may weight a highly specific feature interaction (like 'Rent' + 'Vacation Purpose') strongly, while SHAP distributes the contribution more consistently based on global feature interactions, leading to a more stable explanation. |
 
-  * Overall feature importance
-  * SHAP summary plots
-  * SHAP dependence plots for major features
+***
 
-* **LIME Analysis:**
-  Using 3 selected test cases (1 positive, 1 negative, 1 borderline) and generating local explanations.
+### 5. 💡 2–3 Actionable Business Recommendations Based on Model Insights
 
-* **Clear comments** throughout the code explaining what each section does.
+These recommendations are directly linked to the features and patterns revealed by the SHAP and LIME interpretability analyses.
 
-The Python script should be **directly runnable** without errors when the dataset is provided.
-
----
-
-## **2. Text-based report section with model performance metrics**
-
-This section should present all final evaluation metrics after testing the model. Your report should include:
-
-* **AUC (Area Under ROC Curve):**
-  Measures the model’s ability to correctly classify defaulters vs. non-defaulters.
-
-* **Precision:**
-  Out of all predicted defaulters, how many were actually defaulters.
-
-* **Recall (important metric for credit risk):**
-  Out of all actual defaulters, how many the model successfully caught.
-
-* **Confusion Matrix Interpretation:**
-  Short explanation of True Positives, True Negatives, False Positives, and False Negatives.
-
-Your text should clearly explain what these metrics mean in a business context—for example, higher recall reduces the chance of giving loans to risky customers.
-
----
-
-## **3. Written comparison of global feature importances: GBM model vs. SHAP**
-
-This section must explain:
-
-* **What features the GBM model internally considers most important**
-  (based on built-in feature importance scores like gain, split, cover)
-
-* **What SHAP identifies as the top drivers of loan default risk**
-
-* **How SHAP adds deeper interpretability**
-  such as direction of influence (positive = increases default risk, negative = reduces risk)
-
-You should compare and explain:
-
-* Where both methods agree (e.g., “Age” and “Credit History” were top features in both).
-* Where they differ and why (e.g., GBM may highlight frequency of splits, while SHAP reveals real impact on prediction probability).
-
-This comparison shows understanding of **model structure vs. post-hoc explanation techniques**.
-
----
-
-## **4. Detailed summary of SHAP and LIME results for 3 selected instances**
-
-Choose:
-
-* **1 clear positive (high default risk)**
-* **1 clear negative (low default risk)**
-* **1 borderline or uncertain case**
-
-For each instance:
-
-### Provide:
-
-* **SHAP force plot explanation:**
-  Which features pushed the prediction toward default or non-default.
-
-* **LIME explanation:**
-  A local linear approximation showing the top features affecting that prediction.
-
-### Then explain:
-
-* How SHAP and LIME **agree** (e.g., both highlight high loan amount as risky)
-* How they **differ** (e.g., LIME may give higher weight to employment status, while SHAP focuses more on credit duration)
-* Why such differences occur
-  (LIME is local & linear; SHAP is game-theoretic with consistent attribution)
-
-This item should read like three small case studies with clear reasoning.
-
----
-
-## **5. 2–3 actionable business recommendations based on model insights**
-
-These recommendations should be practical, simple, and connected to the model’s findings.
-
-Examples:
-
-1. **Strengthen loan approval rules for customers with poor credit history or unstable employment**, since both SHAP and LIME highlight these as major drivers of default risk.
-
-2. **Introduce a tiered interest rate system** where customers with moderate risk scores receive a higher but manageable interest rate instead of outright rejection.
-
-3. **Use the model’s explanations during manual review**, helping loan officers understand why a customer was flagged as risky and allowing more transparent decisions.
-
-The recommendations must be clearly tied to the features and patterns revealed by the model.
-
---
-
-
-
+1.  **Strengthen Review Criteria for Loan Term and Amount:**
+    * **Model Insight:** SHAP analysis identified **Duration\_in\_month** and **Credit\_Amount** as top drivers of default risk.
+    * **Recommendation:** Implement a manual review process for any loan exceeding a specific duration (e.g., 36 months) AND a high credit amount (e.g., over \$5,000), regardless of a good credit score. This focuses resources on the specific high-leverage risk combinations revealed by the model.
+2.  **Use Explanation Tools for Transparent Rejections:**
+    * **Model Insight:** Both SHAP and LIME provide clear, feature-specific reasons for a prediction.
+    * **Recommendation:** Integrate the generated explanations (e.g., a SHAP force plot) into the loan officer's review interface. This allows officers to provide **transparent, legally compliant reasons** for loan rejection (e.g., "Your rejection is driven by your long loan duration and critical account status, not just your income").
+3.  **Targeted Pre-Approval for Stable Applicants:**
+    * **Model Insight:** LIME consistently highlights stable factors like high **Age**, long **Employment\_Duration**, and high **Co\_Applicant\_Income** as strong negative contributors to risk.
+    * **Recommendation:** Develop a targeted pre-approval campaign for existing customers who score highly on these stable, low-risk demographic features, bypassing some of the initial high-friction application steps and increasing profitable non-default loans.

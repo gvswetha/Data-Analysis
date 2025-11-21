@@ -229,3 +229,124 @@ Project: Interpretable AI — SHAP & LIME for Credit Risk Assessment
 Created as part of a structured AI/ML learning program.
 
 
+Below is a **clean, simple, detailed, and easy-to-understand version of the Expected Deliverables** for your project.
+You can copy-paste this directly into your submission.
+
+---
+
+# **Expected Deliverables**
+
+## **1. Complete, runnable Python code implementation**
+
+The project should include a full Python script that performs all steps from start to finish. The code must clearly show:
+
+* **Loading and preprocessing the credit dataset:**
+  Handling missing values, encoding categorical variables, normalizing/standardizing features, and splitting data into train/test sets.
+
+* **Training the Gradient Boosting Model:**
+  Using XGBoost or LightGBM, performing hyperparameter tuning (e.g., GridSearchCV or RandomizedSearchCV), and optimizing mainly for **AUC** and **Recall** (because catching defaulters is important).
+
+* **SHAP Analysis:**
+  Generating global explanations such as:
+
+  * Overall feature importance
+  * SHAP summary plots
+  * SHAP dependence plots for major features
+
+* **LIME Analysis:**
+  Using 3 selected test cases (1 positive, 1 negative, 1 borderline) and generating local explanations.
+
+* **Clear comments** throughout the code explaining what each section does.
+
+The Python script should be **directly runnable** without errors when the dataset is provided.
+
+---
+
+## **2. Text-based report section with model performance metrics**
+
+This section should present all final evaluation metrics after testing the model. Your report should include:
+
+* **AUC (Area Under ROC Curve):**
+  Measures the model’s ability to correctly classify defaulters vs. non-defaulters.
+
+* **Precision:**
+  Out of all predicted defaulters, how many were actually defaulters.
+
+* **Recall (important metric for credit risk):**
+  Out of all actual defaulters, how many the model successfully caught.
+
+* **Confusion Matrix Interpretation:**
+  Short explanation of True Positives, True Negatives, False Positives, and False Negatives.
+
+Your text should clearly explain what these metrics mean in a business context—for example, higher recall reduces the chance of giving loans to risky customers.
+
+---
+
+## **3. Written comparison of global feature importances: GBM model vs. SHAP**
+
+This section must explain:
+
+* **What features the GBM model internally considers most important**
+  (based on built-in feature importance scores like gain, split, cover)
+
+* **What SHAP identifies as the top drivers of loan default risk**
+
+* **How SHAP adds deeper interpretability**
+  such as direction of influence (positive = increases default risk, negative = reduces risk)
+
+You should compare and explain:
+
+* Where both methods agree (e.g., “Age” and “Credit History” were top features in both).
+* Where they differ and why (e.g., GBM may highlight frequency of splits, while SHAP reveals real impact on prediction probability).
+
+This comparison shows understanding of **model structure vs. post-hoc explanation techniques**.
+
+---
+
+## **4. Detailed summary of SHAP and LIME results for 3 selected instances**
+
+Choose:
+
+* **1 clear positive (high default risk)**
+* **1 clear negative (low default risk)**
+* **1 borderline or uncertain case**
+
+For each instance:
+
+### Provide:
+
+* **SHAP force plot explanation:**
+  Which features pushed the prediction toward default or non-default.
+
+* **LIME explanation:**
+  A local linear approximation showing the top features affecting that prediction.
+
+### Then explain:
+
+* How SHAP and LIME **agree** (e.g., both highlight high loan amount as risky)
+* How they **differ** (e.g., LIME may give higher weight to employment status, while SHAP focuses more on credit duration)
+* Why such differences occur
+  (LIME is local & linear; SHAP is game-theoretic with consistent attribution)
+
+This item should read like three small case studies with clear reasoning.
+
+---
+
+## **5. 2–3 actionable business recommendations based on model insights**
+
+These recommendations should be practical, simple, and connected to the model’s findings.
+
+Examples:
+
+1. **Strengthen loan approval rules for customers with poor credit history or unstable employment**, since both SHAP and LIME highlight these as major drivers of default risk.
+
+2. **Introduce a tiered interest rate system** where customers with moderate risk scores receive a higher but manageable interest rate instead of outright rejection.
+
+3. **Use the model’s explanations during manual review**, helping loan officers understand why a customer was flagged as risky and allowing more transparent decisions.
+
+The recommendations must be clearly tied to the features and patterns revealed by the model.
+
+--
+
+
+

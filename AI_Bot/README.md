@@ -92,3 +92,8 @@ swetha
 Bo — AI Document Assistant
 Built with Streamlit + SBERT + Whisper
 
+**APP**
+
+https://data-analysis-abrjb5lvgvw2xfvwwtjo9o.streamlit.app/
+
+

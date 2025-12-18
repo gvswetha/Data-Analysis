@@ -8,7 +8,9 @@ import tempfile
 
 import streamlit as st
 import nltk
-nltk.download('punkt')
+nltk.download("punkt")
+nltk.download("punkt_tab")
+
 from nltk.tokenize import sent_tokenize
 
 import PyPDF2
@@ -391,3 +393,4 @@ with st.sidebar:
 
 #         except Exception as e:
 #             st.error(f"Whisper transcription failed: {e}")
+

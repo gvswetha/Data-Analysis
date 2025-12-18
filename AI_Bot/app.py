@@ -1,5 +1,5 @@
 # =============================
-# AI Document Assistant — Bo (Cleaned & Cloud‑Safe)
+# AI Document Assistant — Bo (FINAL • CLOUD-SAFE • STREAMLIT-CORRECT)
 # =============================
 
 import os
@@ -16,7 +16,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # ============================
-# SAFE NLTK SETUP (Cloud‑safe)
+# SAFE NLTK SETUP (Cloud-safe)
 # ============================
 try:
     nltk.data.find("tokenizers/punkt")
@@ -122,10 +122,11 @@ with left:
     st.markdown("<div class='upload-box'><h4>📄 Upload your document</h4></div>", unsafe_allow_html=True)
     file = st.file_uploader("", type=["pdf", "docx", "txt"], label_visibility="collapsed")
 
-    user_query = st.text_input("", placeholder="Ask me about the document…", key="main_query")
+    user_query = st.text_input("", placeholder="Ask me about the document…")
 
     sentences = None
     embeddings = None
+    selected_question = None
 
     if file:
         with st.spinner("🤖 Bo is reading your document…"):
@@ -139,26 +140,30 @@ with left:
             summary = summarize_text(sentences)
             st.markdown("<div class='answer-box'><h3>📘 Summary</h3></div>", unsafe_allow_html=True)
             st.markdown(f"<pre>{summary}</pre>", unsafe_allow_html=True)
-
             st.download_button("⬇️ Download Summary", summary, file_name="summary.txt")
 
             st.markdown("<div class='answer-box'><h3>📌 Suggested Questions</h3></div>", unsafe_allow_html=True)
-            for q in [
+            questions = [
                 "What is this document about?",
                 "What is the objective of this document?",
                 "Explain the key concepts",
                 "Describe the methodology",
                 "What are the conclusions?",
-            ]:
-                if st.button(q):
-                    st.session_state.main_query = q
-                    user_query = q
+            ]
 
-            if user_query:
+            cols = st.columns(len(questions))
+            for i, q in enumerate(questions):
+                with cols[i]:
+                    if st.button(q, key=f"sq_{i}"):
+                        selected_question = q
+
+            query_to_answer = selected_question or user_query
+
+            if query_to_answer:
                 with st.spinner("🤖 Bo is thinking…"):
-                    answer, bullets = answer_question(user_query, sentences, embeddings)
+                    answer, bullets = answer_question(query_to_answer, sentences, embeddings)
 
-                st.session_state.chat.append({"q": user_query, "a": answer})
+                st.session_state.chat.append({"q": query_to_answer, "a": answer})
 
                 st.markdown("<div class='answer-box'><h3>💡 Answer</h3></div>", unsafe_allow_html=True)
                 st.markdown(f"<pre>{answer}</pre>", unsafe_allow_html=True)
@@ -182,4 +187,3 @@ with right:
 
     if st.button("Clear chat"):
         st.session_state.chat = []
-

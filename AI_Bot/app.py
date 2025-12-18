@@ -516,5 +516,6 @@ with right_col:
         st.session_state.chat = []
         st.session_state.main_query = ""
         st.experimental_rerun()
-```
+        
+
 

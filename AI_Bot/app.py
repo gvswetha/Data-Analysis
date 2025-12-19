@@ -54,7 +54,6 @@ st.markdown(
 # ============================
 # HELPERS
 # ============================
-
 def extract_text(file):
     if file.type == "application/pdf":
         reader = PyPDF2.PdfReader(file)
@@ -78,7 +77,6 @@ def summarize_text(sentences, ratio=0.15):
     return "\n".join([f"- {s.strip().rstrip('.') + '.'}" for s in summary_sentences])
 
 
-
 def get_context(text, sentence, window=200):
     idx = text.find(sentence)
     if idx == -1:
@@ -87,13 +85,6 @@ def get_context(text, sentence, window=200):
     end = min(len(text), idx + len(sentence) + window)
     snippet = text[start:end]
     return snippet.replace(sentence, f"<b>{sentence}</b>")
-
-st.markdown("## 📑 Summary")
-st.markdown("### Key Points")
-st.markdown(summarize_text(sentences))
-
-st.markdown("## 🔍 Context")
-st.markdown(get_context(sample_text, "automate tasks"), unsafe_allow_html=True)
 
 
 
@@ -229,4 +220,5 @@ with st.sidebar:
         st.markdown(f"**You:** {turn['query']}")
         st.markdown(f"**Bo:** {turn['answer']}")
         st.divider()
+
 

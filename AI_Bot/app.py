@@ -54,9 +54,6 @@ st.markdown(
 # ============================
 # HELPERS
 # ============================
-# ============================
-# HELPERS (Updated)
-# ============================
 
 def extract_text(file):
     if file.type == "application/pdf":
@@ -77,8 +74,9 @@ def summarize_text(sentences, ratio=0.15):
         return "No content to summarize."
     count = max(3, int(len(sentences) * ratio))
     summary_sentences = sentences[:count]
-    # Add bullet points and ensure sentences end with a period
+    # Return Markdown bullet points with proper sentence endings
     return "\n".join([f"- {s.strip().rstrip('.') + '.'}" for s in summary_sentences])
+
 
 
 def get_context(text, sentence, window=200):
@@ -95,7 +93,9 @@ st.markdown("### Key Points")
 st.markdown(summarize_text(sentences))
 
 st.markdown("## 🔍 Context")
-st.markdown(get_context(text, "your chosen sentence"))
+st.markdown(get_context(sample_text, "automate tasks"), unsafe_allow_html=True)
+
+
 
 
 @st.cache_resource
@@ -229,3 +229,4 @@ with st.sidebar:
         st.markdown(f"**You:** {turn['query']}")
         st.markdown(f"**Bo:** {turn['answer']}")
         st.divider()
+

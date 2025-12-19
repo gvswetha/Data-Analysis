@@ -40,11 +40,7 @@ st.markdown(
     .upload-box { border:2px dashed #C7B8FF; padding:20px; border-radius:12px; background:rgba(0,0,0,.25); }
     .answer-box { background:rgba(0,0,0,.4); padding:18px; border-radius:12px; margin-top:12px; }
     pre { white-space: pre-wrap; }
-    b { color:#ffe66d; } /* Bold highlight color */
-    ul.custom-bullets { list-style-type: none; padding-left: 1em; }
-    ul.custom-bullets li::before { content: "• "; color:#C7B8FF; font-weight:bold; }
-    h2 { color:#ffe66d; }
-    h3 { color:#C7B8FF; }
+    mark { background:#ffe66d; }
     </style>
     """,
     unsafe_allow_html=True
@@ -55,6 +51,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ============================
+# HELPERS
+# ============================
 # ============================
 # HELPERS (Updated)
 # ============================
@@ -79,8 +78,7 @@ def summarize_text(sentences, ratio=0.15):
     count = max(3, int(len(sentences) * ratio))
     summary_sentences = sentences[:count]
     # Add bullet points and ensure sentences end with a period
-    formatted = "".join([f"<li>{s.strip().rstrip('.') + '.'}</li>" for s in summary_sentences])
-    return f"<ul class='custom-bullets'>{formatted}</ul>"
+    return "\n".join([f"- {s.strip().rstrip('.') + '.'}" for s in summary_sentences])
 
 
 def get_context(text, sentence, window=200):
@@ -92,18 +90,142 @@ def get_context(text, sentence, window=200):
     snippet = text[start:end]
     return snippet.replace(sentence, f"<b>{sentence}</b>")
 
+st.markdown("## 📑 Summary")
+st.markdown("### Key Points")
+st.markdown(summarize_text(sentences))
+
+st.markdown("## 🔍 Context")
+st.markdown(get_context(text, "your chosen sentence"))
+
+
+@st.cache_resource
+def load_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+
+def doc_hash(text):
+    return hashlib.md5(text.encode()).hexdigest()
+
+
+@st.cache_data
+def embed_sentences(hash_key, sentences_tuple):
+    model = load_model()
+    return model.encode(list(sentences_tuple), show_progress_bar=False)
+
+
+def answer_question(query, sentences, embeddings, text, k=5):
+    model = load_model()
+    q_emb = model.encode([query])
+    sims = cosine_similarity(q_emb, embeddings)[0]
+    top = sims.argsort()[-k:][::-1]
+
+    results = []
+    for i in top:
+        results.append({
+            "sentence": sentences[i],
+            "score": float(sims[i]),
+            "context": get_context(text, sentences[i])
+        })
+
+    return {
+        "combined": " ".join(r["sentence"] for r in results),
+        "bullets": "\n".join(f"- {r['sentence']}" for r in results),
+        "results": results,
+    }
+
 # ============================
-# EXAMPLE USAGE
+# SESSION STATE
 # ============================
+if "chat" not in st.session_state:
+    st.session_state.chat = []
 
-# Example text (replace with uploaded file content)
-sample_text = "Artificial Intelligence helps automate tasks. It improves efficiency and reduces errors. AI can also assist in decision making."
+# ============================
+# LAYOUT
+# ============================
+col_main, col_side = st.columns([2, 1])
 
-sentences = preprocess_sentences(sample_text)
+# ----------------------------
+# MAIN COLUMN
+# ----------------------------
+with col_main:
+    st.markdown("<div class='upload-box'><h4>📄 Upload document</h4></div>", unsafe_allow_html=True)
+    file = st.file_uploader("", type=["pdf", "docx", "txt"], label_visibility="collapsed")
 
-st.markdown("## 📑 Summary", unsafe_allow_html=True)
-st.markdown("### Key Points", unsafe_allow_html=True)
-st.markdown(summarize_text(sentences), unsafe_allow_html=True)
+    user_query = st.text_input(
+        "Ask a question",
+        placeholder="Ask me about the document…",
+        key="main_query"
+    )
 
-st.markdown("## 🔍 Context", unsafe_allow_html=True)
-st.markdown(get_context(sample_text, "automate tasks"), unsafe_allow_html=True)
+    selected_question = None
+
+    if file:
+        text = extract_text(file)
+        sentences = preprocess_sentences(text)
+
+        if not sentences:
+            st.error("No valid sentences found.")
+            st.stop()
+
+        embeddings = embed_sentences(doc_hash(text), tuple(sentences))
+
+        st.markdown("<div class='answer-box'><h3>📘 Summary</h3></div>", unsafe_allow_html=True)
+        summary = summarize_text(sentences)
+        st.markdown(f"<pre>{summary}</pre>", unsafe_allow_html=True)
+
+        st.download_button("⬇️ Download Summary", summary, "summary.txt")
+
+        st.markdown("<div class='answer-box'><h3>📌 Suggested Questions</h3></div>", unsafe_allow_html=True)
+        samples = [
+            "What is this document about?",
+            "What is the objective?",
+            "Explain key concepts",
+            "Describe the methodology",
+            "What are the conclusions?"
+        ]
+
+        cols = st.columns(len(samples))
+        for i, q in enumerate(samples):
+            with cols[i]:
+                if st.button(q, key=f"s{i}"):
+                    selected_question = q
+
+        query = selected_question or user_query
+
+        if query:
+            result = answer_question(query, sentences, embeddings, text)
+            st.session_state.chat.append({"query": query, "answer": result["combined"]})
+
+            st.markdown("<div class='answer-box'><h3>💡 Answer</h3></div>", unsafe_allow_html=True)
+            st.markdown(result["combined"])
+            st.markdown("<pre>" + result["bullets"] + "</pre>")
+
+            st.session_state.last_result = result
+            st.session_state.last_text = text
+
+# ----------------------------
+# SIDE COLUMN
+# ----------------------------
+with col_side:
+    st.markdown("<div class='answer-box'><h3>✨ Insights</h3></div>", unsafe_allow_html=True)
+
+    res = st.session_state.get("last_result")
+    txt = st.session_state.get("last_text")
+
+    if res and txt:
+        for i, r in enumerate(res["results"]):
+            with st.expander(f"{i+1}. {r['sentence'][:60]}..."):
+                st.markdown(r["context"], unsafe_allow_html=True)
+                st.caption(f"Score: {r['score']:.3f}")
+    else:
+        st.caption("Ask a question to see insights.")
+
+# ----------------------------
+# SIDEBAR HISTORY
+# ----------------------------
+with st.sidebar:
+    st.markdown("## 🗂️ History")
+    for turn in reversed(st.session_state.chat):
+        st.markdown(f"**You:** {turn['query']}")
+        st.markdown(f"**Bo:** {turn['answer']}")
+        st.divider()

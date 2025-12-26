@@ -11,7 +11,7 @@ import docx
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from openai import OpenAI
+# from openai import OpenAI
 
 # =============================
 # 🔐 PASTE YOUR OPENROUTER KEY
@@ -176,3 +176,4 @@ with st.sidebar:
                 st.markdown(item["answer"])
     else:
         st.caption("No searches yet.")
+

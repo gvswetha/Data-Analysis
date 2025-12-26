@@ -156,11 +156,13 @@ if file:
 else:
     st.info("Upload a document to begin.")
 
-# Save to history (keep last 5)
 st.session_state.history.insert(0, {
     "question": query,
-    "answer": answer
+    "answer": result["answer"],
+    "bullets": result.get("bullets", []),
+    "heading": result.get("heading", "")
 })
+
 
 st.session_state.history = st.session_state.history[:5]
 # =============================
@@ -176,4 +178,5 @@ with st.sidebar:
                 st.markdown(item["answer"])
     else:
         st.caption("No searches yet.")
+
 

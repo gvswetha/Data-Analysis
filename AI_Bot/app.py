@@ -1,224 +1,178 @@
 # =============================
-# AI Document Assistant — Bo
+# AI Document Assistant — FREE LLM (Mistral via OpenRouter)
 # =============================
 
 import hashlib
 import streamlit as st
-
-# ----------------------------
-# NLTK (safe for cloud)
-# ----------------------------
 import nltk
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
 from nltk.tokenize import sent_tokenize
-
-# ----------------------------
-# File parsing
-# ----------------------------
 import PyPDF2
 import docx
 
-# ----------------------------
-# ML
-# ----------------------------
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from openai import OpenAI
 
-# ============================
-# PAGE CONFIG
-# ============================
-st.set_page_config(page_title="AI Document Assistant", layout="wide")
+# =============================
+# 🔐 PASTE YOUR OPENROUTER KEY
+# =============================
+import os
 
-st.markdown(
-    """
-    <style>
-    .stApp { background: linear-gradient(to bottom, #E6D9FF, #000000); color: white; }
-    .hero { text-align:center; margin:20px 0; }
-    .upload-box { border:2px dashed #C7B8FF; padding:20px; border-radius:12px; background:rgba(0,0,0,.25); }
-    .answer-box { background:rgba(0,0,0,.4); padding:18px; border-radius:12px; margin-top:12px; }
-    pre { white-space: pre-wrap; }
-    mark { background:#ffe66d; }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-st.markdown(
-    "<div class='hero'><h1>🤖 Hi, I’m Bo</h1><h4>Your AI document assistant</h4></div>",
-    unsafe_allow_html=True,
-)
+client = None
 
-# ============================
+if OPENROUTER_API_KEY:
+    from openai import OpenAI
+    client = OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
+
+
+# =============================
+# BASIC SETUP
+# =============================
+# =============================
+# SEARCH HISTORY (LAST 5)
+# =============================
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+st.set_page_config(page_title="AI Document Assistant (Free LLM)", layout="wide")
+
+@st.cache_resource
+def load_nltk():
+    nltk.download("punkt")
+
+load_nltk()
+
+@st.cache_resource
+def load_sbert():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+# =============================
 # HELPERS
-# ============================
+# =============================
+
 def extract_text(file):
     if file.type == "application/pdf":
         reader = PyPDF2.PdfReader(file)
-        return " ".join(p.extract_text() for p in reader.pages if p.extract_text())
-    elif "wordprocessingml" in file.type:
+        return " ".join(filter(None, [p.extract_text() for p in reader.pages]))
+    elif file.type.endswith("wordprocessingml.document"):
         doc = docx.Document(file)
         return " ".join(p.text for p in doc.paragraphs)
-    return file.read().decode("utf-8", errors="ignore")
+    else:
+        return file.read().decode("utf-8", errors="ignore")
 
 
 def preprocess_sentences(text):
     return [s.strip() for s in sent_tokenize(text) if len(s.strip()) > 40]
 
 
-def summarize_text(sentences, ratio=0.15):
-    if not sentences:
-        return "No content to summarize."
-    count = max(3, int(len(sentences) * ratio))
-    summary_sentences = sentences[:count]
-    # Return Markdown bullet points with proper sentence endings
-    return "\n".join([f"- {s.strip().rstrip('.') + '.'}" for s in summary_sentences])
-
-
-def get_context(text, sentence, window=200):
-    idx = text.find(sentence)
-    if idx == -1:
-        return f"<b>{sentence}</b>"
-    start = max(0, idx - window)
-    end = min(len(text), idx + len(sentence) + window)
-    snippet = text[start:end]
-    return snippet.replace(sentence, f"<b>{sentence}</b>")
-
-
-
-
-@st.cache_resource
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
-
-
-def doc_hash(text):
+def get_doc_hash(text):
     return hashlib.md5(text.encode()).hexdigest()
 
 
 @st.cache_data
-def embed_sentences(hash_key, sentences_tuple):
-    model = load_model()
-    return model.encode(list(sentences_tuple), show_progress_bar=False)
+def embed_sentences(doc_hash, sentences):
+    model = load_sbert()
+    return model.encode(sentences, show_progress_bar=False)
 
 
-def answer_question(query, sentences, embeddings, text, k=5):
-    model = load_model()
+def retrieve_context(query, sentences, embeddings, top_k=5):
+    model = load_sbert()
     q_emb = model.encode([query])
     sims = cosine_similarity(q_emb, embeddings)[0]
-    top = sims.argsort()[-k:][::-1]
 
-    results = []
-    for i in top:
-        results.append({
-            "sentence": sentences[i],
-            "score": float(sims[i]),
-            "context": get_context(text, sentences[i])
-        })
+    top_k = min(top_k, len(sentences))
+    idx = sims.argsort()[-top_k:][::-1]
+    return [sentences[i] for i in idx]
 
-    return {
-        "combined": " ".join(r["sentence"] for r in results),
-        "bullets": "\n".join(f"- {r['sentence']}" for r in results),
-        "results": results,
-    }
 
-# ============================
-# SESSION STATE
-# ============================
-if "chat" not in st.session_state:
-    st.session_state.chat = []
+def structured_answer(query, context_sentences):
+    context = "\n".join(context_sentences)
 
-# ============================
-# LAYOUT
-# ============================
-col_main, col_side = st.columns([2, 1])
+    prompt = f"""
+Answer ONLY using the document context below.
+Do not use outside knowledge.
 
-# ----------------------------
-# MAIN COLUMN
-# ----------------------------
-with col_main:
-    st.markdown("<div class='upload-box'><h4>📄 Upload document</h4></div>", unsafe_allow_html=True)
-    file = st.file_uploader("", type=["pdf", "docx", "txt"], label_visibility="collapsed")
+Format exactly like this:
 
-    user_query = st.text_input(
-        "Ask a question",
-        placeholder="Ask me about the document…",
-        key="main_query"
+## Heading
+
+### Direct Answer
+(2–3 sentences)
+
+### Key Points
+- Bullet points
+
+### Key Takeaways
+- Short takeaways
+
+Document Context:
+{context}
+
+Question:
+{query}
+"""
+
+    response = client.chat.completions.create(
+        model="mistralai/mistral-7b-instruct:free",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2
     )
 
-    selected_question = None
+    return response.choices[0].message.content
 
-    if file:
-        text = extract_text(file)
-        sentences = preprocess_sentences(text)
+# =============================
+# UI
+# =============================
 
-        if not sentences:
-            st.error("No valid sentences found.")
-            st.stop()
+st.title("🤖 Bo — AI Document Assistant (FREE Mistral)")
 
-        embeddings = embed_sentences(doc_hash(text), tuple(sentences))
+file = st.file_uploader("📄 Upload a document", type=["pdf", "docx", "txt"])
+query = st.text_input("🔍 Ask a question about the document")
 
-        st.markdown("<div class='answer-box'><h3>📘 Summary</h3></div>", unsafe_allow_html=True)
-        summary = summarize_text(sentences)
-        st.markdown(f"<pre>{summary}</pre>", unsafe_allow_html=True)
+if file:
+    text = extract_text(file)
+    sentences = preprocess_sentences(text)
 
-        st.download_button("⬇️ Download Summary", summary, "summary.txt")
+    if not sentences:
+        st.error("No valid content found.")
+        st.stop()
 
-        st.markdown("<div class='answer-box'><h3>📌 Suggested Questions</h3></div>", unsafe_allow_html=True)
-        samples = [
-            "What is this document about?",
-            "What is the objective?",
-            "Explain key concepts",
-            "Describe the methodology",
-            "What are the conclusions?"
-        ]
+    embeddings = embed_sentences(get_doc_hash(text), sentences)
 
-        cols = st.columns(len(samples))
-        for i, q in enumerate(samples):
-            with cols[i]:
-                if st.button(q, key=f"s{i}"):
-                    selected_question = q
+    if query:
+        with st.spinner("Bo is thinking (free model)..."):
+            context = retrieve_context(query, sentences, embeddings)
+            answer = structured_answer(query, context)
 
-        query = selected_question or user_query
+        st.markdown("### 💡 Answer")
+        st.markdown(answer)
 
-        if query:
-            result = answer_question(query, sentences, embeddings, text)
-            st.session_state.chat.append({"query": query, "answer": result["combined"]})
+else:
+    st.info("Upload a document to begin.")
 
-            st.markdown("<div class='answer-box'><h3>💡 Answer</h3></div>", unsafe_allow_html=True)
-            st.markdown(result["combined"])
-            st.markdown("<pre>" + result["bullets"] + "</pre>")
+# Save to history (keep last 5)
+st.session_state.history.insert(0, {
+    "question": query,
+    "answer": answer
+})
 
-            st.session_state.last_result = result
-            st.session_state.last_text = text
+st.session_state.history = st.session_state.history[:5]
+# =============================
+# SEARCH HISTORY UI
+# =============================
 
-# ----------------------------
-# SIDE COLUMN
-# ----------------------------
-with col_side:
-    st.markdown("<div class='answer-box'><h3>✨ Insights</h3></div>", unsafe_allow_html=True)
-
-    res = st.session_state.get("last_result")
-    txt = st.session_state.get("last_text")
-
-    if res and txt:
-        for i, r in enumerate(res["results"]):
-            with st.expander(f"{i+1}. {r['sentence'][:60]}..."):
-                st.markdown(r["context"], unsafe_allow_html=True)
-                st.caption(f"Score: {r['score']:.3f}")
-    else:
-        st.caption("Ask a question to see insights.")
-
-# ----------------------------
-# SIDEBAR HISTORY
-# ----------------------------
 with st.sidebar:
-    st.markdown("## 🗂️ History")
-    for turn in reversed(st.session_state.chat):
-        st.markdown(f"**You:** {turn['query']}")
-        st.markdown(f"**Bo:** {turn['answer']}")
-        st.divider()
+    st.subheader("🕘 Last 5 Searches")
 
-
+    if st.session_state.history:
+        for i, item in enumerate(st.session_state.history, 1):
+            with st.expander(f"{i}. {item['question']}"):
+                st.markdown(item["answer"])
+    else:
+        st.caption("No searches yet.")

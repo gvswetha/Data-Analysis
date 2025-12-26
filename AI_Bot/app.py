@@ -130,7 +130,7 @@ Question:
 # UI
 # =============================
 
-st.title("🤖 Bo — AI Document Assistant (FREE Mistral)")
+st.title("🤖 Bo — AI Document Assistant")
 
 file = st.file_uploader("📄 Upload a document", type=["pdf", "docx", "txt"])
 query = st.text_input("🔍 Ask a question about the document")
@@ -148,35 +148,28 @@ if file:
     if query:
         with st.spinner("Bo is thinking (free model)..."):
             context = retrieve_context(query, sentences, embeddings)
-            answer = structured_answer(query, context)
+            result = structured_answer(query, context)  # ✅ DEFINE RESULT
 
+        # --- UI ---
         st.markdown("### 💡 Answer")
-        st.markdown(answer)
+        st.markdown(f"**{result['heading']}**")
+        st.markdown(result["answer"])
+
+        st.markdown("#### 🔑 Key Points")
+        for b in result["bullets"]:
+            st.markdown(f"- {b}")
+
+        # --- SAVE HISTORY (ONLY AFTER RESULT EXISTS) ---
+        st.session_state.history.insert(0, {
+            "question": query,
+            "answer": result["answer"],
+            "bullets": result["bullets"],
+            "heading": result["heading"]
+        })
+
+        st.session_state.history = st.session_state.history[:5]
 
 else:
     st.info("Upload a document to begin.")
-
-st.session_state.history.insert(0, {
-    "question": query,
-    "answer": result["answer"],
-    "bullets": result.get("bullets", []),
-    "heading": result.get("heading", "")
-})
-
-
-st.session_state.history = st.session_state.history[:5]
-# =============================
-# SEARCH HISTORY UI
-# =============================
-
-with st.sidebar:
-    st.subheader("🕘 Last 5 Searches")
-
-    if st.session_state.history:
-        for i, item in enumerate(st.session_state.history, 1):
-            with st.expander(f"{i}. {item['question']}"):
-                st.markdown(item["answer"])
-    else:
-        st.caption("No searches yet.")
 
 

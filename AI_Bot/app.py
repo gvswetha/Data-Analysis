@@ -1,7 +1,8 @@
 # =============================
-# AI Document Assistant — FREE LLM (Mistral via OpenRouter)
+# AI Document Assistant — FREE (OpenRouter Mistral)
 # =============================
 
+import os
 import hashlib
 import streamlit as st
 import nltk
@@ -11,51 +12,50 @@ import docx
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-# from openai import OpenAI
 
 # =============================
-# 🔐 PASTE YOUR OPENROUTER KEY
+# PAGE CONFIG
 # =============================
-import os
-
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-
-client = None
-
-if OPENROUTER_API_KEY:
-    from openai import OpenAI
-    client = OpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url="https://openrouter.ai/api/v1"
-    )
-
+st.set_page_config(page_title="Bo — AI Document Assistant", layout="wide")
 
 # =============================
-# BASIC SETUP
+# SESSION STATE (HISTORY)
 # =============================
-# =============================
-# SEARCH HISTORY (LAST 5)
-# =============================
-
 if "history" not in st.session_state:
     st.session_state.history = []
 
-st.set_page_config(page_title="AI Document Assistant (Free LLM)", layout="wide")
-
+# =============================
+# LOADERS
+# =============================
 @st.cache_resource
 def load_nltk():
     nltk.download("punkt")
-
-load_nltk()
 
 @st.cache_resource
 def load_sbert():
     return SentenceTransformer("all-MiniLM-L6-v2")
 
+load_nltk()
+
+# =============================
+# OPENROUTER CLIENT (SAFE)
+# =============================
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+client = None
+if OPENROUTER_API_KEY:
+    try:
+        from openai import OpenAI
+        client = OpenAI(
+            api_key=OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1"
+        )
+    except ModuleNotFoundError:
+        client = None
+
 # =============================
 # HELPERS
 # =============================
-
 def extract_text(file):
     if file.type == "application/pdf":
         reader = PyPDF2.PdfReader(file)
@@ -118,6 +118,10 @@ Question:
 {query}
 """
 
+    # If no API key → graceful message
+    if not client:
+        return "⚠️ LLM not enabled. Add OPENROUTER_API_KEY in Streamlit secrets."
+
     response = client.chat.completions.create(
         model="mistralai/mistral-7b-instruct:free",
         messages=[{"role": "user", "content": prompt}],
@@ -129,8 +133,9 @@ Question:
 # =============================
 # UI
 # =============================
-
 st.title("🤖 Bo — AI Document Assistant")
+
+st.sidebar.caption("Mode: LLM Enabled" if client else "Mode: Free (No API Key)")
 
 file = st.file_uploader("📄 Upload a document", type=["pdf", "docx", "txt"])
 query = st.text_input("🔍 Ask a question about the document")
@@ -146,30 +151,33 @@ if file:
     embeddings = embed_sentences(get_doc_hash(text), sentences)
 
     if query:
-        with st.spinner("Bo is thinking (free model)..."):
+        with st.spinner("Bo is thinking..."):
             context = retrieve_context(query, sentences, embeddings)
-            result = structured_answer(query, context)  # ✅ DEFINE RESULT
+            answer = structured_answer(query, context)
 
-        # --- UI ---
+        # Show answer
         st.markdown("### 💡 Answer")
-        st.markdown(f"**{result['heading']}**")
-        st.markdown(result["answer"])
+        st.markdown(answer)
 
-        st.markdown("#### 🔑 Key Points")
-        for b in result["bullets"]:
-            st.markdown(f"- {b}")
-
-        # --- SAVE HISTORY (ONLY AFTER RESULT EXISTS) ---
+        # Save history (LAST 5)
         st.session_state.history.insert(0, {
             "question": query,
-            "answer": result["answer"],
-            "bullets": result["bullets"],
-            "heading": result["heading"]
+            "answer": answer
         })
-
         st.session_state.history = st.session_state.history[:5]
 
 else:
     st.info("Upload a document to begin.")
 
+# =============================
+# SIDEBAR HISTORY
+# =============================
+with st.sidebar:
+    st.subheader("🕘 Last 5 Searches")
 
+    if st.session_state.history:
+        for i, item in enumerate(st.session_state.history, 1):
+            with st.expander(f"{i}. {item['question']}"):
+                st.markdown(item["answer"])
+    else:
+        st.caption("No searches yet.")

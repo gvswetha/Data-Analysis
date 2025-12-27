@@ -1,96 +1,44 @@
-AI Document Assistant — Bo
-==========================
+# 🤖 Bo — AI Document Assistant (Free LLM)
 
-Bo is an AI-powered document assistant built with Streamlit. It allows users to:
+Bo is a **Document Question Answering (QA) web app** built with **Streamlit**, **Sentence Transformers**, and a **free LLM (Mistral via OpenRouter)**.  
+It allows users to upload documents and ask questions, receiving **structured, well-organized answers** based strictly on the document content.
 
-• Upload PDF, DOCX, or TXT files  
-• Automatically summarize the document  
-• Ask questions about the content  
-• View highlighted context from the original document  
-• Use voice input (via Whisper API)  
-• Maintain chat history  
-• Enjoy a clean two-column professional UI with a dark gradient theme  
+---
 
----------------------------------------
-FEATURES
----------------------------------------
+## ✨ Features
 
-1. Document Upload
-   - Supports PDF, DOCX, and TXT
-   - Extracts text automatically
+- 📄 Upload documents (`PDF`, `DOCX`, `TXT`)
+- 🔍 Ask natural-language questions about the document
+- 🧠 Semantic search using **Sentence-BERT**
+- 🤖 Free LLM support using **Mistral-7B (OpenRouter)**
+- 📝 Structured answers with:
+  - Headings
+  - Direct answers
+  - Bullet points
+  - Key takeaways
+- 🕘 Stores **last 5 questions & answers**
+- ☁️ Fully compatible with **Streamlit Cloud**
+- 🔐 Runs even **without an API key** (graceful fallback)
 
-2. Smart Summary
-   - Generates a concise extractive summary
-   - Downloadable as a text file
 
-3. Semantic Search (SBERT)
-   - Uses all-MiniLM-L6-v2 for sentence embeddings
-   - Cached embeddings for fast repeated queries
+## 🛠️ Tech Stack
 
-4. Question Answering
-   - Retrieves the most relevant sentences
-   - Combines them into a natural answer
-   - Shows bullet points and relevance scores
+- **Frontend / App**: Streamlit  
+- **LLM**: `mistralai/mistral-7b-instruct:free` (via OpenRouter)  
+- **Embeddings**: Sentence-Transformers (`all-MiniLM-L6-v2`)  
+- **Similarity Search**: Scikit-learn (cosine similarity)  
+- **NLP**: NLTK  
+- **Document Parsing**: PyPDF2, python-docx  
 
-5. Highlighted Context
-   - Shows where each answer came from inside the document
-   - Highlights the exact sentence in context
+---
 
-6. Voice Input (Whisper API)
-   - Upload audio (wav/mp3/m4a)
-   - Whisper transcribes it into text
-   - Automatically inserts into the chat
+## 📂 Project Structure
 
-7. Chat History
-   - Stored in Streamlit session state
-   - Expandable sidebar history
 
-8. Modern UI
-   - Two-column layout
-   - Dark gradient theme
-   - Clean cards and typography
-
----------------------------------------
-REQUIREMENTS
----------------------------------------
-
-Install dependencies:
-
-    pip install -r requirements.txt
-
-Set your OpenAI API key:
-
-    export OPENAI_API_KEY="your_key_here"
-    (Windows PowerShell)
-    setx OPENAI_API_KEY "your_key_here"
-
-Run the app:
-
-    streamlit run app.py
-
----------------------------------------
-FILE STRUCTURE
----------------------------------------
-
-app.py
-README.txt
-requirements.txt
-
----------------------------------------
-NOTES
----------------------------------------
-
-• Whisper API requires an OpenAI API key  
-• SBERT embeddings are cached per document for speed  
-• Voice input uses Streamlit’s built-in audio uploader  
-• The app runs entirely locally except for Whisper API calls  
-
----------------------------------------
-AUTHOR
----------------------------------------
-swetha 
-Bo — AI Document Assistant
-Built with Streamlit + SBERT + Whisper
+.
+├── app.py              # Main Streamlit application
+├── requirements.txt    # Python dependencies
+├── README.md           # Project documentation
 
 **APP**
 

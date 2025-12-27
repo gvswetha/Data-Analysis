@@ -5,6 +5,13 @@
 import os
 import hashlib
 import streamlit as st
+import os
+
+# Force NLTK to use a writable directory (CRITICAL for Streamlit Cloud)
+NLTK_DATA_DIR = os.path.join(os.getcwd(), "nltk_data")
+os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+os.environ["NLTK_DATA"] = NLTK_DATA_DIR
+
 import nltk
 from nltk.tokenize import sent_tokenize
 import PyPDF2
@@ -27,17 +34,22 @@ if "history" not in st.session_state:
 # =============================
 # LOADERS
 # =============================
+import nltk
+import streamlit as st
+
 @st.cache_resource
 def load_nltk():
-    nltk.download("punkt")
-    nltk.download("punkt_tab")
+    nltk.data.path.append(NLTK_DATA_DIR)
+    nltk.download("punkt", download_dir=NLTK_DATA_DIR)
+    nltk.download("punkt_tab", download_dir=NLTK_DATA_DIR)
+
+load_nltk()
+
 
 
 @st.cache_resource
 def load_sbert():
     return SentenceTransformer("all-MiniLM-L6-v2")
-
-load_nltk()
 
 # =============================
 # OPENROUTER CLIENT (SAFE)
@@ -69,8 +81,14 @@ def extract_text(file):
         return file.read().decode("utf-8", errors="ignore")
 
 
+from nltk.tokenize import sent_tokenize
+
 def preprocess_sentences(text):
-    return [s.strip() for s in sent_tokenize(text) if len(s.strip()) > 40]
+    try:
+        return [s.strip() for s in sent_tokenize(text) if len(s.strip()) > 40]
+    except LookupError:
+        # Absolute fallback (never crashes)
+        return [s.strip() for s in text.split(".") if len(s.strip()) > 40]
 
 
 def get_doc_hash(text):
@@ -183,4 +201,5 @@ with st.sidebar:
                 st.markdown(item["answer"])
     else:
         st.caption("No searches yet.")
+
 

@@ -30,6 +30,8 @@ if "history" not in st.session_state:
 @st.cache_resource
 def load_nltk():
     nltk.download("punkt")
+    nltk.download("punkt_tab")
+
 
 @st.cache_resource
 def load_sbert():
@@ -181,3 +183,4 @@ with st.sidebar:
                 st.markdown(item["answer"])
     else:
         st.caption("No searches yet.")
+
